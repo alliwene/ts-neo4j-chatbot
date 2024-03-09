@@ -37,13 +37,13 @@ NEXT_PUBLIC_CHATBOT_GREETING="Hello, I'm **Ebert**, your movie recommendation bo
 To run the application, you must install the dependencies listed in `package.json`.
 
 [source,sh]
-npm i
+pnpm i
 
 
-Then run the `npm run dev` command to start the app on link:http://localhost:3000/[http://localhost:3000/^].
+Then run the `pnpm run dev` command to start the app on link:http://localhost:3000/[http://localhost:3000/^].
 
 [source,sh]
-npm run dev
+pnpm run dev
 
 == Questions, Comments, Feedback
 
