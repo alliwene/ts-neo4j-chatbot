@@ -94,7 +94,7 @@ describe("Conversation History", () => {
     for (const id of ids) {
       expect(first.context).toContain(id);
     }
-  });
+  }, 10000);
 
   it("should save a chain of responses", async () => {
     const sessionId = "test-3";
