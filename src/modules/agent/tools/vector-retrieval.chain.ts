@@ -1,15 +1,10 @@
-import {
-  Runnable,
-  RunnablePassthrough,
-  RunnablePick,
-} from "@langchain/core/runnables";
-import { Embeddings } from "@langchain/core/embeddings";
-import initGenerateAnswerChain from "../chains/answer-generation.chain";
-import { BaseLanguageModel } from "langchain/base_language";
-import initVectorStore from "../vector.store";
-import { saveHistory } from "../history";
 import { DocumentInterface } from "@langchain/core/documents";
+import { Embeddings } from "@langchain/core/embeddings";
+import { Runnable } from "@langchain/core/runnables";
+import { BaseLanguageModel } from "langchain/base_language";
+
 import { AgentToolInput } from "../agent.types";
+import initVectorStore from "../vector.store";
 
 // tag::throughput[]
 type RetrievalChainThroughput = AgentToolInput & {
@@ -37,8 +32,8 @@ export default async function initVectorRetrievalChain(
   llm: BaseLanguageModel,
   embeddings: Embeddings
 ): Promise<Runnable<AgentToolInput, string>> {
-  // TODO: Create vector store instance
-  // const vectorStore = ...
+  const vectorStore = await initVectorStore(embeddings);
+
   // TODO: Initialize a retriever wrapper around the vector store
   // const vectorStoreRetriever = ...
   // TODO: Initialize Answer chain
