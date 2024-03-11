@@ -1,9 +1,15 @@
 import { DocumentInterface } from "@langchain/core/documents";
 import { Embeddings } from "@langchain/core/embeddings";
-import { Runnable } from "@langchain/core/runnables";
+import {
+  Runnable,
+  RunnablePassthrough,
+  RunnablePick,
+} from "@langchain/core/runnables";
 import { BaseLanguageModel } from "langchain/base_language";
 
 import { AgentToolInput } from "../agent.types";
+import initGenerateAnswerChain from "../chains/answer-generation.chain";
+import { saveHistory } from "../history";
 import initVectorStore from "../vector.store";
 
 // tag::throughput[]
@@ -34,11 +40,37 @@ export default async function initVectorRetrievalChain(
 ): Promise<Runnable<AgentToolInput, string>> {
   const vectorStore = await initVectorStore(embeddings);
 
-  // TODO: Initialize a retriever wrapper around the vector store
-  // const vectorStoreRetriever = ...
-  // TODO: Initialize Answer chain
-  // const answerChain = ...
-  // TODO: Return chain
-  // return RunnablePassthrough.assign( ... )
+  const vectorStoreRetriever = vectorStore.asRetriever(5);
+
+  const answerChain = initGenerateAnswerChain(llm);
+
+  return RunnablePassthrough.assign({
+    documents: new RunnablePick("rephrasedQuestion").pipe(vectorStoreRetriever),
+  })
+    .assign({
+      // Extract the IDs
+      ids: new RunnablePick("documents").pipe(extractDocumentIds),
+      // convert documents to string
+      context: new RunnablePick("documents").pipe(docsToJson),
+    })
+    .assign({
+      output: (input: RetrievalChainThroughput) =>
+        answerChain.invoke({
+          question: input.rephrasedQuestion,
+          context: input.context,
+        }),
+    })
+    .assign({
+      responseId: async (input: RetrievalChainThroughput, options) =>
+        saveHistory(
+          options?.config.configurable.sessionId,
+          "vector",
+          input.input,
+          input.rephrasedQuestion,
+          input.output,
+          input.ids
+        ),
+    })
+    .pick("output");
 }
 // end::function[]
