@@ -16,7 +16,7 @@ export default async function initTools(
   const cypherChain = await initCypherRetrievalChain(llm, graph);
   const retrievalChain = await initVectorRetrievalChain(llm, embeddings);
 
-  // TODO: Append chains to output
+  
   return [
     new DynamicStructuredTool({
       name: "graph-cypher-retrieval-chain",

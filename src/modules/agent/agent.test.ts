@@ -24,7 +24,6 @@ describe("Langchain Agent", () => {
 
     llm = new ChatOpenAI({
       openAIApiKey: process.env.OPENAI_API_KEY,
-      modelName: "gpt-4",
       temperature: 0,
     });
 
@@ -33,7 +32,7 @@ describe("Langchain Agent", () => {
     });
 
     executor = await initAgent(llm, embeddings, graph);
-  });
+  }, 20000);
 
   afterAll(() => graph.close());
 
